@@ -1,0 +1,40 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    name: Ejecutar pruebas y linters
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Obtén el código
+      - uses: actions/checkout@v3
+
+      # 2. Configura Python
+      - name: Setup Python 3.10
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      # 3. Instala dependencias
+      - name: Instalar dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      # 4. Linting con flake8
+      - name: Linting con flake8
+        run: |
+          if [ -f setup.cfg ]; then
+            pip install flake8
+            flake8 src tests
+          fi
+
+      # 5. Ejecuta los tests
+      - name: Ejecutar pytest
+        run: pytest --maxfail=1 --disable-warnings -q
